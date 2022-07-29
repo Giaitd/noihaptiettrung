@@ -1,4 +1,4 @@
-package com.giaitd.testsensor;
+package com.giaitd.testsensor.RTDModule;
 
 import android.widget.TextView;
 
@@ -8,7 +8,7 @@ import asim.sdk.common.Utils;
 import asim.sdk.tempandhum.SDKTemperatureAndHumidity;
 import asim.sdk.tempandhum.TempHumiData;
 
-public class SDKExtend extends SDKTemperatureAndHumidity {
+public class SdkRTD extends SDKTemperatureAndHumidity {
 
     public TempHumiData getTempHumiData() {
 
@@ -19,15 +19,14 @@ public class SDKExtend extends SDKTemperatureAndHumidity {
             this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
             String checkMustHave = Utils.bytesToHex(new byte[]{bufferStatus[0], bufferStatus[1], bufferStatus[2]});
             if (checkMustHave.equals("010304")) {
-                String temp = Utils.bytesToHex(new byte[]{bufferStatus[3], bufferStatus[4]});
-                String humi = Utils.bytesToHex(new byte[]{bufferStatus[5], bufferStatus[6]});
-                //String dewdrop = Utils.bytesToHex(new byte[]{bufferStatus[7], bufferStatus[8]});
-                double temp2 = (double)Integer.parseInt(temp, 16) / 10.0D;
-                double humi2 = (double)Integer.parseInt(humi, 16) / 10.0D;
-                double dewdrop2 = 0;
+                String temp1 = Utils.bytesToHex(new byte[]{bufferStatus[3], bufferStatus[4]});
+                String temp2 = Utils.bytesToHex(new byte[]{bufferStatus[5], bufferStatus[6]});
+                double temp1Data = (double)Integer.parseInt(temp1, 16) / 10.0D;
+                double temp2Data = (double)Integer.parseInt(temp1, 16) / 10.0D;
+                double unUse = 0;
                 this.disconnect();
 
-               return new TempHumiData(temp2, humi2, dewdrop2);
+               return new TempHumiData(temp1Data, temp2Data, unUse);
             } else {
                 this.disconnect();
                 return null;
