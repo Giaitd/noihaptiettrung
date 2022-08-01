@@ -8,12 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.giaitd.testsensor.DIDOModule.DIDOModule;
-import com.giaitd.testsensor.DIDOModule.DIData;
-import com.giaitd.testsensor.DIDOModule.ReadDI;
+import com.giaitd.testsensor.DIDOModule.DIDOData;
 
 import java.util.List;
 import java.util.Timer;
@@ -27,23 +27,25 @@ public class MainActivity extends AppCompatActivity {
     
     
     TextView textView3, textView2,textView1 ;
-    Button btnButton,btnOff;
-    //Handler mTimerHandler = new Handler();
+    Button btnButton,btnOff, button;
+    Handler mTimerHandler = new Handler();
     public static boolean checkConnect;
+    int num = 0;
 
 
-
-        @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
-    };
-
+//        @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//
+//
+//    };
 
 
-// read sensor
+    /**
+    * Read sensor
+    */
+
 //    public Timer timerSensor;
 //    public TimerTask timerTaskSensor;
 
@@ -83,8 +85,100 @@ public class MainActivity extends AppCompatActivity {
 //
 //    }
 
+    /**
+    Read DI,DO Coil
+    */
 
-//read DI
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        textView3 = findViewById(R.id.textView3);
+        textView2 = findViewById(R.id.textView2);
+        textView1 = findViewById(R.id.textView1);
+        btnButton = findViewById(R.id.btnButton);
+
+        Timer timerDI = new Timer();
+        TimerTask timerTaskDI = new TimerTask() {
+            @Override
+            public void run() {
+                mTimerHandler.post(new Runnable() {
+                    @SuppressLint("SetTextI18n")
+                    public void run() {
+
+                        Log.i("Supervisor", "======Collect data from Sensor=====");
+                        DIDOModule DISdk = new DIDOModule();
+                        DIDOData DIDOData = null;
+
+
+                        List<DeviceInfo> devices = SDKLocker.getAllUsbDevicesHasDriver(getApplicationContext());
+                        for (DeviceInfo each : devices) {
+                            boolean connect = DISdk.connect(getApplicationContext(), each, 9600);
+                            if (connect) {
+                                DIDOData = DISdk.getDIData();
+
+                                textView3.setText(DIDOData.valueRead3 + "");
+//                                textView2.setText(diData.valueRead2 + "");
+//                                textView1.setText(diData.valueRead1 + "");
+
+
+
+                            }
+                        }
+                    }
+                });
+
+            }
+        };
+
+        timerDI.schedule(timerTaskDI,0l,1000l);
+
+        Timer timerDO = new Timer();
+        TimerTask timerTaskDO = new TimerTask() {
+            @Override
+            public void run() {
+                mTimerHandler.post(new Runnable() {
+                    @SuppressLint("SetTextI18n")
+                    public void run() {
+
+                        Log.i("Supervisor", "======Collect data from Sensor=====");
+                        DIDOModule DISdk = new DIDOModule();
+//                        DIData diData = null;
+                        DIDOData doData = null;
+
+                        List<DeviceInfo> devices = SDKLocker.getAllUsbDevicesHasDriver(getApplicationContext());
+                        for (DeviceInfo each : devices) {
+                            boolean connect = DISdk.connect(getApplicationContext(), each, 9600);
+                            if (connect) {
+//                                diData = DISdk.getDIData();
+//
+//                                textView3.setText(diData.valueRead3 + "");
+//                                textView2.setText(diData.valueRead2 + "");
+//                                textView1.setText(diData.valueRead1 + "");
+
+                                doData = DISdk.getDOData();
+
+//                                textView3.setText(doData.valueDO3 + "");
+//                                textView2.setText(doData.valueDO2 + "");
+                                textView1.setText(doData.valueRead1 + "");
+
+                            }
+                        }
+                    }
+                });
+
+            }
+        };
+
+        timerDO.schedule(timerTaskDO,0l,1000l);
+    }
+
+
+    /**
+    Write DO
+    */
+
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -92,78 +186,35 @@ public class MainActivity extends AppCompatActivity {
 //
 //        textView3 = findViewById(R.id.textView3);
 //        textView2 = findViewById(R.id.textView2);
-//        textView1 = findViewById(R.id.textView1);
-//        btnButton = findViewById(R.id.btnButton);
+//        button = findViewById(R.id.button);
 //
-//        Timer timerDI = new Timer();
-//        TimerTask timerTaskSensor = new TimerTask() {
-//            @Override
-//            public void run() {
-//                mTimerHandler.post(new Runnable() {
-//                    @SuppressLint("SetTextI18n")
-//                    public void run() {
-//
-//                        Log.i("Supervisor", "======Collect data from Sensor=====");
-//                        DIDOModule DISdk = new DIDOModule();
-//                        DIData diData = null;
-//
-//                        List<DeviceInfo> devices = SDKLocker.getAllUsbDevicesHasDriver(getApplicationContext());
-//                        for (DeviceInfo each : devices) {
-//                            boolean connect = DISdk.connect(getApplicationContext(), each, 9600);
-//                            if (connect) {
-//                                diData = DISdk.getDIData();
-//
-//                                int num3 = diData.valueRead3;
-//                                int num2 = diData.valueRead2;
-//                                int num1 = diData.valueRead1;
-//                                textView3.setText(num3 + "");
-//                                textView2.setText(num2 + "");
-//                                textView1.setText(num1 + "");
-//
-//                            }
-//                        }
-//                    }
-//                });
-//
-//            }
-//        };
-
-//        timerDI.schedule(timerTaskSensor,0l,1000l);
 //    }
 
-//Write DO
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        tempView = findViewById(R.id.tempView);
-//        btnButton = findViewById(R.id.btnButton);
-//        btnOff = findViewById(R.id.btnOff);
-//
-//        DIDOModule DOSdk = new DIDOModule();
-//
-//
-//        List<DeviceInfo> device = SDKLocker.getAllUsbDevicesHasDriver(getApplicationContext());
-//        for (DeviceInfo each : device) {
-//            checkConnect = DOSdk.connect(getApplicationContext(), each, 9600);
-//        }
-//            btnButton.setOnClickListener(v -> {
-//                if (checkConnect) {
-//                    DIDOModule.bufferAll = new byte[]{1, 5, 0, 1, -1, 0, -35, -6};
-//                    DOSdk.setDOData();
-//                    //DI_DO_module.bufferAll = new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
-//                }
-//            });
-//
-//            btnOff.setOnClickListener(v -> {
-//                if (checkConnect) {
-//                    DIDOModule.bufferAll = new byte[]{1, 5, 0, 1, 0, 0, -100, 10};
-//                    DOSdk.setDOData();
-//                    //DI_DO_module.bufferAll = new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
-//                }
-//            });
-//    };
+
+    public void countUp(View view) {
+        DIDOModule.bufferAll = new byte[]{1, 5, 0, 1, -1, 0, -35, -6};
+        writeDO(view);
+    }
+
+
+    public void countDown(View view){
+        DIDOModule.bufferAll = new byte[]{1, 5, 0, 1, 0, 0, -100, 10};
+        writeDO(view);
+    }
+
+
+    public void writeDO(View view) {
+
+        DIDOModule DOSdk = new DIDOModule();
+
+        List<DeviceInfo> devices = SDKLocker.getAllUsbDevicesHasDriver(getApplicationContext());
+        for (DeviceInfo each : devices) {
+            boolean connect = DOSdk.connect(getApplicationContext(), each, 9600);
+            if (connect) {
+                DOSdk.setDOData();
+            }
+        }
+    }
 
 
 }

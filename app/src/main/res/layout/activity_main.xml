@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="84dp"
         android:text="BTN ON"
+        android:onClick="countUp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.261"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
         android:text="BTN OFF"
+        android:onClick="countDown"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.812"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,5 +66,14 @@
         app:layout_constraintHorizontal_bias="0.763"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:onClick="writeDO"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

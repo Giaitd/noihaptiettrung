@@ -121,7 +121,7 @@ public class DIDOModule {
         }
     }
 
-    public DIData getDIData() {
+    public DIDOData getDIData() {
         try {
             byte[] buffer = new byte[]{1,2,0,0,0,24,120,0};
             this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
@@ -129,18 +129,83 @@ public class DIDOModule {
             this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
             String checkMustHave = Utils.bytesToHex(new byte[]{bufferStatus[0], bufferStatus[1]});
             if (checkMustHave.equals("0102")) {
+                int valueRead3 = 0;
+                int valueRead2 = 0;
+                int valueRead1 = 0;
                 String numberByte = Utils.bytesToHex(new byte[]{bufferStatus[2]});
-                String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});
-                String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});
-                String value3 = Utils.bytesToHex(new byte[]{bufferStatus[5]});
-
-                int valueRead3 = Integer.parseInt(value3);
-                int valueRead2 = Integer.parseInt(value2);
-                int valueRead1 = Integer.parseInt(value1);
                 int numberByteMore = Integer.parseInt(numberByte);
 
+                if (numberByteMore==1){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = 0;
+                    valueRead3 = 0;
+                } else if (numberByteMore==2){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});//8 bit mid
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = Integer.parseInt(value2);
+                    valueRead3 = 0;
+
+                } else if (numberByteMore==3){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});//8 bit mid
+                    String value3 = Utils.bytesToHex(new byte[]{bufferStatus[5]});//8 bit high
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = Integer.parseInt(value2);
+                    valueRead3 = Integer.parseInt(value3);
+                }
+
                 this.disconnect();
-                return new DIData(valueRead1,valueRead2,valueRead3, numberByteMore);
+                return new DIDOData(valueRead1,valueRead2,valueRead3, numberByteMore);
+            } else {
+                this.disconnect();
+                return null;
+            }
+        } catch (IOException var14) {
+            var14.printStackTrace();
+            this.disconnect();
+            return null;
+        }
+    }
+
+    public DIDOData getDOData() {
+        try {
+            byte[] buffer = new byte[]{1,1,0,0,0,7,125,-56};
+            this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
+            byte[] bufferStatus = new byte[10];
+            this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
+            String checkMustHave = Utils.bytesToHex(new byte[]{bufferStatus[0], bufferStatus[1]});
+            if (checkMustHave.equals("0101")) {
+                int valueRead3 = 0;
+                int valueRead2 = 0;
+                int valueRead1 = 0;
+                String numberByte = Utils.bytesToHex(new byte[]{bufferStatus[2]});
+                int numberByteMore = Integer.parseInt(numberByte);
+
+                if (numberByteMore==1){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = 0;
+                    valueRead3 = 0;
+                } else if (numberByteMore==2){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});//8 bit mid
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = Integer.parseInt(value2);
+                    valueRead3 = 0;
+
+                } else if (numberByteMore==3){
+                    String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
+                    String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});//8 bit mid
+                    String value3 = Utils.bytesToHex(new byte[]{bufferStatus[5]});//8 bit high
+                    valueRead1 = Integer.parseInt(value1);
+                    valueRead2 = Integer.parseInt(value2);
+                    valueRead3 = Integer.parseInt(value3);
+                }
+
+                this.disconnect();
+                return new DIDOData(valueRead1,valueRead2,valueRead3, numberByteMore);
             } else {
                 this.disconnect();
                 return null;
@@ -155,33 +220,18 @@ public class DIDOModule {
     public void setDOData() {
         try {
             byte[] buffer = bufferAll;
-                    //new byte[]{1,5,0,1,-1,0,-35,-6};
             this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
             byte[] bufferStatus = new byte[10];
             this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
-            //this.disconnect();
+            this.disconnect();
         } catch (IOException var14) {
             var14.printStackTrace();
             this.disconnect();
         }
 
-        this.setDOData();
     }
 
-//    public void setOffDOData() {
-//        try {
-//            byte[] buffer = new byte[]{1,5,0,1,0,0,-100,10};
-//            this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
-//            byte[] bufferStatus = new byte[10];
-//            this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
-//
-//        } catch (IOException var14) {
-//            var14.printStackTrace();
-//            this.disconnect();
-//        }
-//
-//        this.setOffDOData();
-//    }
+
 
     public void disconnect() {
         this.connected = false;
@@ -193,5 +243,6 @@ public class DIDOModule {
 
         this.usbSerialPort = null;
     }
+
 
 }

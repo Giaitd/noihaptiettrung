@@ -6,13 +6,12 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import asim.sdk.locker.DeviceInfo;
 import asim.sdk.locker.SDKLocker;
 
-public class ReadDI {
+public class ReadDIDO {
     private static Handler mTimerHandler;
 
     public static TimerTask getDITask(String m_androidId, Context context){
@@ -25,13 +24,13 @@ public class ReadDI {
 
                         Log.i("Supervisor", "======Collect data from Digital Input=====");
                         DIDOModule DISdk = new DIDOModule();
-                        DIData diData = null;
+                        DIDOData DIDOData = null;
 
                         List<DeviceInfo> devices = SDKLocker.getAllUsbDevicesHasDriver(context);
                         for (DeviceInfo each : devices) {
                             boolean connect = DISdk.connect(context, each, 9600);
                             if (connect) {
-                                diData = DISdk.getDIData();
+                                DIDOData = DISdk.getDIData();
                             }
                         }
                     }
