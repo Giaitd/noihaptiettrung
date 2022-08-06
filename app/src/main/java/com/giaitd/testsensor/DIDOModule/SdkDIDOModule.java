@@ -6,6 +6,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
 
+import com.giaitd.testsensor.Program.Globals;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
@@ -18,17 +19,17 @@ import asim.sdk.common.Utils;
 import asim.sdk.locker.CustomProber;
 import asim.sdk.locker.DeviceInfo;
 
-public class DIDOModule {
+public class SdkDIDOModule {
     public UsbSerialPort usbSerialPort;
     public boolean connected = false;
     public int READ_WAIT_MILLIS = 2000;
     public int WRITE_WAIT_MILLIS = 2000;
 
-    public DIDOModule(){
+    public SdkDIDOModule(){
 
     }
 
-    public static byte[] bufferAll = null;
+
 
     public boolean connect(Context context, DeviceInfo deviceInfo, int baudRate) {
         UsbSerialDriver driver = deviceInfo.driver;
@@ -121,7 +122,8 @@ public class DIDOModule {
         }
     }
 
-    public DIDOData getDIData() {
+
+    public DIData getDIData() {
         try {
             byte[] buffer = new byte[]{1,2,0,0,0,24,120,0};
             this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
@@ -151,13 +153,24 @@ public class DIDOModule {
                     String value1 = Utils.bytesToHex(new byte[]{bufferStatus[3]});//8 bit low
                     String value2 = Utils.bytesToHex(new byte[]{bufferStatus[4]});//8 bit mid
                     String value3 = Utils.bytesToHex(new byte[]{bufferStatus[5]});//8 bit high
-                    valueRead1 = Integer.parseInt(value1);
-                    valueRead2 = Integer.parseInt(value2);
-                    valueRead3 = Integer.parseInt(value3);
+                    valueRead1 = Integer.parseInt(value1,16);
+                    valueRead2 = Integer.parseInt(value2,16);
+                    valueRead3 = Integer.parseInt(value3,16);
+                }
+
+                boolean[] i0 = new boolean[8];
+                boolean[] i1 = new boolean[8];
+                boolean[] i2 = new boolean[8];
+
+                for (int i = 0; i < 8; i++) {
+                    i0[i] = (valueRead1 & (1 << i)) != 0;
+                    i1[i] = (valueRead2 & (1 << i)) != 0;
+                    i2[i] = (valueRead3 & (1 << i)) != 0;
                 }
 
                 this.disconnect();
-                return new DIDOData(valueRead1,valueRead2,valueRead3, numberByteMore);
+                return new DIData(i0,i1,i2);
+
             } else {
                 this.disconnect();
                 return null;
@@ -169,7 +182,7 @@ public class DIDOModule {
         }
     }
 
-    public DIDOData getDOData() {
+    public DOData getDOData() {
         try {
             byte[] buffer = new byte[]{1,1,0,0,0,7,125,-56};
             this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
@@ -203,9 +216,19 @@ public class DIDOModule {
                     valueRead2 = Integer.parseInt(value2);
                     valueRead3 = Integer.parseInt(value3);
                 }
+                boolean[] q0 = new boolean[8];
+                boolean[] q1 = new boolean[8];
+                boolean[] q2 = new boolean[8];
+
+                for (int i = 0; i < 8; i++) {
+                    q0[i] = (valueRead1 & (1 << i)) != 0;
+                    q1[i] = (valueRead2 & (1 << i)) != 0;
+                    q2[i] = (valueRead3 & (1 << i)) != 0;
+                }
+
 
                 this.disconnect();
-                return new DIDOData(valueRead1,valueRead2,valueRead3, numberByteMore);
+                return new DOData(q0,q1,q2);
             } else {
                 this.disconnect();
                 return null;
@@ -219,8 +242,7 @@ public class DIDOModule {
 
     public void setDOData() {
         try {
-            byte[] buffer = bufferAll;
-            this.usbSerialPort.write(buffer, this.WRITE_WAIT_MILLIS);
+            this.usbSerialPort.write(Globals.bufferAll, this.WRITE_WAIT_MILLIS);
             byte[] bufferStatus = new byte[10];
             this.usbSerialPort.read(bufferStatus, this.READ_WAIT_MILLIS);
             this.disconnect();
@@ -246,3 +268,4 @@ public class DIDOModule {
 
 
 }
+
