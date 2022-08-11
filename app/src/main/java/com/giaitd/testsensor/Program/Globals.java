@@ -49,13 +49,13 @@ public class Globals {
     public static String status;
 
     //program value set
-    public static Double tempSet;
-    public static Double sterTimeSet;
-    public static Integer dryTimeSet;
+    public static Double tempSet =121.0;
+    public static Double sterTimeSet = 5.0;
+    public static Integer dryTimeSet = 2;
 
 
     //printer
-    public static boolean enalblePrinter;
+    public static boolean enablePrinter;
     public static int cyclePrinter;
 
     //T&P
@@ -64,7 +64,7 @@ public class Globals {
 
 
     //setup vacuum
-    public static Integer numberHCKSet = 0;
+    public static Integer numberHCKSet = 2;
     public static Double pressHCKSet;
 
 
@@ -72,12 +72,25 @@ public class Globals {
     public static int minCount;
     public static int secCount;
 
-    public static int countTimeSterilization = 0;
-    public static int countTimeDry = 0;
+    public static int countTimeVacuumAirRemove;
+    public static int countTimeExhaustAirRemove;
+
+    public static int countTimeSterilization;
+    public static int countTimeDry;
+
+    public static int countTimerBalance;
+
+
+
 
     //state of program
     public static byte progress;
     public static int numberVacuumCount = 0;
+    public static boolean errorStatus;
+    public static boolean reachTAndP;
+
+    public static boolean fullWater;
+    public static boolean exhaustVacuum;
 
 
 
